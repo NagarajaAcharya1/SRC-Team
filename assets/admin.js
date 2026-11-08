@@ -2,7 +2,7 @@
   "use strict";
   const api = window.SrcAPI, esc = window.SrcLinks.esc, safePhoto = window.SrcLinks.safePhoto;
   const $ = (s) => document.querySelector(s);
-  const ROLES = ["Lead", "Event Lead", "Media", "Tech", "Design", "Volunteer"];
+  const ROLES = ["Lead", "Event Lead", "Event Crew", "Media", "Tech", "Design", "Volunteer"];
   const SEED_KEYS = {
     "ee95a9ef-6e8e-4959-8f88-dd45575e3f9d": "src_pruthvi_kr_2026",
     "ffcdcef8-19b2-40e7-a86c-de801b1fd908": "src_hemanth_2026",

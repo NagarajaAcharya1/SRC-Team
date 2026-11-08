@@ -26,10 +26,6 @@
 
 <!-- ============ TEAM LIST ============ -->
 <main class="view active" id="home">
-  <div class="top">
-    <img src="assets/icon.png" alt="" width="44" height="38">
-    <span>Sahyadri<br>Robotics Club</span>
-  </div>
   <header class="hero">
     <svg class="bg-gear" id="heroGear" viewBox="-100 -100 200 200" aria-hidden="true"></svg>
     <h1>Team</h1>
@@ -43,6 +39,18 @@
       <span class="note" id="ctaNote"></span>
     </div>
   </header>
+
+  <div class="search-bar" id="searchBar">
+    <div class="search-inner">
+      <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="search" id="searchInput" class="search-inp" placeholder="Search members by name or role…" autocomplete="off" spellcheck="false" aria-label="Search members">
+      <button type="button" id="searchClear" class="search-clear" aria-label="Clear search" hidden>×</button>
+    </div>
+    <button type="button" id="searchBtn" class="btn search-btn" aria-label="Search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span>Search</span>
+    </button>
+  </div>
 
   <div class="chips" id="chips" role="group" aria-label="Filter by role"></div>
   <section class="list" id="list" aria-label="Team members"></section>

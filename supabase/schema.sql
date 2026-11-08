@@ -9,7 +9,7 @@ create table if not exists public.members (
   id          uuid primary key default gen_random_uuid(),
   name        text not null check (char_length(btrim(name)) between 2 and 60),
   role        text not null default 'Volunteer'
-              check (role in ('Lead','Event Lead','Media','Tech','Design','Volunteer')),
+              check (role in ('Lead','Event Lead','Event Crew','Media','Tech','Design','Volunteer')),
   photo_url   text check (photo_url is null or photo_url ~ '^(https://|images/)[^[:space:]<>"'']{3,250}$'),
   instagram   text check (instagram is null or instagram ~ '^https://[^[:space:]<>"'']{4,250}$'),
   linkedin    text check (linkedin  is null or linkedin  ~ '^https://[^[:space:]<>"'']{4,250}$'),

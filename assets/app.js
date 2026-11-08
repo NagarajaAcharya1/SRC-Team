@@ -3,14 +3,14 @@
   const L = window.SrcLinks, api = window.SrcAPI, cfg = window.SRC_CONFIG || {};
   const esc = L.esc;
   const $ = (s, r = document) => r.querySelector(s);
-  const ROLES = ["Lead", "Event Lead", "Media", "Tech", "Design", "Volunteer"];
+  const ROLES = ["Lead", "Event Lead", "Event Crew", "Media", "Tech", "Design", "Volunteer"];
   const PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100"><rect width="80" height="100" fill="#1a002e"/><circle cx="40" cy="38" r="15" fill="#4b0082"/><path d="M10 100c2-26 16-38 30-38s28 12 30 38z" fill="#4b0082"/></svg>');
   const GO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>';
   const ARROW = GO.replace("<svg ", '<svg class="ar" ');
 
   /* ---------- state ---------- */
-  let members = [], ready = false, loadFailed = false, isOpen = true, filter = "All", lastY = 0, io = null;
+  let members = [], ready = false, loadFailed = false, isOpen = true, filter = "All", searchQuery = "", lastY = 0, io = null;
   const views = { home: $("#home"), profile: $("#profile"), form: $("#form") };
 
   /* ---------- storage (every access guarded: private mode can throw) ---------- */
@@ -128,7 +128,20 @@
   }
 
   function renderList() {
-    $("#count").textContent = ready ? (members.length === 1 ? "1 person" : members.length + " people") : "The people";
+    const q = searchQuery.toLowerCase().trim();
+    const items = members.filter((m) => {
+      const matchRole = filter === "All" || m.role === filter;
+      if (!matchRole) return false;
+      if (!q) return true;
+      const name = String(m.name || "").toLowerCase();
+      const role = String(m.role || "").toLowerCase();
+      return name.includes(q) || role.includes(q);
+    });
+    $("#count").textContent = ready
+      ? q
+        ? (items.length === 1 ? "1 match" : items.length + " matches")
+        : (members.length === 1 ? "1 person" : members.length + " people")
+      : "The people";
     if (!ready) {
       listEl.innerHTML = loadFailed
         ? `<div class="empty"><h3>Can't load the team</h3><p>Check your internet connection.</p><button class="btn" id="retry">Try again</button></div>`
@@ -139,7 +152,10 @@
       listEl.innerHTML = `<div class="empty"><h3>No cards yet</h3><p>${isOpen ? "Be the first to add yours." : "Check back soon."}</p>${isOpen ? '<a class="btn" href="#/join">Add your card</a>' : ""}</div>`;
       return;
     }
-    const items = members.filter((m) => filter === "All" || m.role === filter);
+    if (!items.length) {
+      listEl.innerHTML = `<div class="empty"><h3>No matches found</h3><p>No team members matching "<b>${esc(searchQuery)}</b>"${filter !== "All" ? ` in ${esc(filter)}` : ""}.</p><button class="btn alt" id="clearSearchBtn" type="button">Clear search</button></div>`;
+      return;
+    }
     listEl.innerHTML = items.map((m, i) =>
       (i ? `<div class="node" aria-hidden="true"><svg viewBox="-100 -100 200 200" class="g" data-dir="${i % 2 ? -1 : 1}"><path d="${gearPath(10, 96, 76, 34)}" fill-rule="evenodd"/></svg></div>` : "") + badgeHTML(m, i)).join("");
     if (io) io.disconnect();
@@ -147,8 +163,53 @@
     listEl.querySelectorAll(".badge-wrap").forEach((el) => io.observe(el));
   }
 
+  /* search input & button controls */
+  const searchInput = $("#searchInput"), searchClear = $("#searchClear"), searchBtn = $("#searchBtn");
+  function clearSearch() {
+    searchQuery = "";
+    if (searchInput) searchInput.value = "";
+    if (searchClear) searchClear.hidden = true;
+    renderList();
+  }
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      searchQuery = searchInput.value.trim();
+      if (searchClear) searchClear.hidden = !searchQuery;
+      renderList();
+    });
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        searchInput.blur();
+      } else if (e.key === "Escape") {
+        clearSearch();
+      }
+    });
+  }
+  if (searchClear) {
+    searchClear.addEventListener("click", () => {
+      clearSearch();
+      searchInput.focus();
+    });
+  }
+  if (searchBtn) {
+    searchBtn.addEventListener("click", () => {
+      if (!searchInput.value.trim()) {
+        searchInput.focus();
+      } else {
+        searchQuery = searchInput.value.trim();
+        renderList();
+        const first = listEl.querySelector(".badge-wrap");
+        if (first) first.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    });
+  }
+
   chipsEl.addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; filter = b.dataset.r; renderChips(); renderList(); });
-  listEl.addEventListener("click", (e) => { if (e.target.closest("#retry")) loadData(); });
+  listEl.addEventListener("click", (e) => {
+    if (e.target.closest("#retry")) loadData();
+    if (e.target.closest("#clearSearchBtn")) clearSearch();
+  });
   listEl.addEventListener("pointermove", (e) => {
     const b = e.target.closest(".badge"); if (!b) return;
     const r = b.getBoundingClientRect(); b.style.setProperty("--mx", e.clientX - r.left + "px"); b.style.setProperty("--my", e.clientY - r.top + "px");
