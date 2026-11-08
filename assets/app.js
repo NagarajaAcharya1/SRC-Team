@@ -542,7 +542,7 @@
   ================================================================ */
   function init() {
     if (api.mode === "demo") $("#demoBanner").hidden = false;
-    const site = $("#siteLink"); if (cfg.CLUB_SITE) site.href = cfg.CLUB_SITE; else site.removeAttribute("href");
+    const site = $("#siteLink"); if (site) { if (cfg.CLUB_SITE) site.href = cfg.CLUB_SITE; else site.removeAttribute("href"); }
     const cached = store.get("src_cache_v1");
     if (Array.isArray(cached) && cached.length) { members = cached; ready = true; }
     updateCTA(); route();
