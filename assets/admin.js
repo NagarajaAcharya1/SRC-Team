@@ -3,6 +3,16 @@
   const api = window.SrcAPI, esc = window.SrcLinks.esc, safePhoto = window.SrcLinks.safePhoto;
   const $ = (s) => document.querySelector(s);
   const ROLES = ["Lead", "Event Lead", "Media", "Tech", "Design", "Volunteer"];
+  const SEED_KEYS = {
+    "ee95a9ef-6e8e-4959-8f88-dd45575e3f9d": "src_pruthvi_kr_2026",
+    "ffcdcef8-19b2-40e7-a86c-de801b1fd908": "src_hemanth_2026",
+    "8f34fb13-5e48-4ce5-9b5e-a677372b3b0f": "src_yash_shetty_2026",
+    "acb33c93-f77c-4b29-af6d-5082ee595159": "src_gopalakrishna_2026",
+    "d2ed5888-960b-4c8b-88d2-21ac180fbe32": "src_pratheeksha_2026",
+    "a6af9cab-0e61-420f-9ff3-a1d32fb42c5e": "src_nagaraja_2026",
+    "cc89ea9b-b8ef-434d-b3e4-5be5520049fc": "src_harshitha_2026",
+    "f573c365-e035-421b-89c7-1b52cd00746f": "src_likhitha_2026"
+  };
   let pass = "", data = null;
   const toast = $("#toast");
   const say = (t) => { toast.textContent = t; toast.classList.add("show"); clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove("show"), 2000); };
@@ -15,7 +25,9 @@
     $("#total").textContent = data.members.length + " cards" + (hiddenN ? " (" + hiddenN + " hidden)" : "");
     $("#openState").textContent = data.open ? "Submissions are open" : "Submissions are closed";
     $("#toggleOpen").textContent = data.open ? "Close submissions" : "Open submissions";
-    $("#rows").innerHTML = data.members.map((m) => `
+    $("#rows").innerHTML = data.members.map((m) => {
+      const editKey = SEED_KEYS[m.id];
+      return `
       <div class="adm-card${m.hidden ? " off" : ""}" data-id="${esc(m.id)}">
         <img src="${esc(safePhoto(m.photo_url) || "assets/icon.png")}" alt="">
         <div>
@@ -28,10 +40,12 @@
           <div class="adm-ctl">
             <button class="btn-ghost save" type="button">Save</button>
             <a class="btn-ghost" href="index.html#/m/${esc(m.id)}" target="_blank" rel="noopener">View</a>
+            ${editKey ? `<a class="btn-ghost" href="index.html#/edit/${esc(m.id)}/${esc(editKey)}" target="_blank" rel="noopener" style="color:var(--cyan);border-color:rgba(47,182,230,.5)" title="Edit photo, name, and social links">Edit Card</a>` : ""}
             <button class="btn-ghost del" type="button" style="color:#ff6b8a;border-color:rgba(255,107,138,.5)">Delete</button>
           </div>
         </div>
-      </div>`).join("") || '<p class="none" style="margin-top:20px">No cards yet.</p>';
+      </div>`;
+    }).join("") || '<p class="none" style="margin-top:20px">No cards yet.</p>';
   }
 
   $("#loginForm").addEventListener("submit", async (e) => {
