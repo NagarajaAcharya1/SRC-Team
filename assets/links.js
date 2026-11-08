@@ -92,10 +92,17 @@
     try { const u = new URL(v); return cleanHost(u.hostname) + u.pathname.replace(/\/$/, ""); } catch (e) { return v; }
   }
 
+  /* generates URL-friendly slug from a name: e.g. "Pruthvi K R" -> "pruthvi-k-r" */
+  function toSlug(name) {
+    return String(name || "").toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
   /* only the links this person actually filled in */
   function filled(m) {
     return PLATFORMS.filter((p) => hrefFor(p.key, m[p.key])).map((p) => ({ p, href: hrefFor(p.key, m[p.key]), text: shownFor(p.key, m[p.key]) }));
   }
 
-  window.SrcLinks = { esc, ICONS, PLATFORMS, BY_KEY, normalize, hrefFor, shownFor, filled, safePhoto };
+  window.SrcLinks = { esc, ICONS, PLATFORMS, BY_KEY, normalize, hrefFor, shownFor, filled, safePhoto, toSlug };
 })();

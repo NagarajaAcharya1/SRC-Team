@@ -49,6 +49,40 @@
   const photoOf = (m) => L.safePhoto(m.photo_url) || PLACEHOLDER;
   const shareUrl = (hash) => location.origin + location.pathname + hash;
 
+  /* URL slug helpers: makes /#/m/pruthvi-k-r instead of raw uuid */
+  function slugFor(m) {
+    if (!m) return "";
+    const base = L.toSlug(m.name) || (m.id ? String(m.id).slice(0, 8) : "member");
+    const dupes = members.filter((x) => L.toSlug(x.name) === base);
+    if (dupes.length <= 1) return base;
+    const idx = dupes.findIndex((x) => x.id === m.id);
+    return idx > 0 ? `${base}-${idx + 1}` : base;
+  }
+
+  function findMember(identifier) {
+    if (!identifier) return null;
+    const raw = decodeURIComponent(identifier).trim();
+    const lower = raw.toLowerCase();
+    // 1. Direct ID match
+    let m = members.find((x) => x.id === raw || String(x.id).toLowerCase() === lower);
+    if (m) return m;
+    // 2. Exact slugFor match
+    m = members.find((x) => slugFor(x) === lower);
+    if (m) return m;
+    // 3. Base slug or lowercase name match
+    m = members.find((x) => L.toSlug(x.name) === lower || x.name.toLowerCase() === lower);
+    if (m) return m;
+    // 4. Normalized letters match (e.g. "pruthvik" -> "pruthvikr")
+    const clean = lower.replace(/[^a-z0-9]/g, "");
+    if (clean.length >= 3) {
+      m = members.find((x) => {
+        const c = L.toSlug(x.name).replace(/-/g, "");
+        return c === clean || c.startsWith(clean) || clean.startsWith(c);
+      });
+    }
+    return m || null;
+  }
+
   /* ================================================================
      BADGE CARD (used on the list and in the live form preview)
   ================================================================ */
@@ -57,9 +91,10 @@
     const long = Math.max(0, ...String(m.name || "").split(/\s+/).map((w) => w.length)) >= 9;
     const icons = L.filled(m).map(({ p, href }) =>
       `<a class="ic" style="--c:${p.color}" href="${esc(href)}" ${p.key === "email" ? "" : 'target="_blank" rel="noopener noreferrer"'} aria-label="${esc(m.name)} on ${p.label}" title="${p.label}">${L.ICONS[p.key]}</a>`).join("");
+    const linkSlug = slugFor(m);
     return `<article class="badge-wrap${right ? " r" : ""}${o.in ? " in" : ""}">
       <div class="badge"><div class="badge-in">
-        ${o.preview ? "" : `<a class="cover" href="#/m/${esc(m.id)}" aria-label="Open ${esc(m.name)}, ${esc(m.role)}"></a>`}
+        ${o.preview ? "" : `<a class="cover" href="#/m/${esc(linkSlug)}" aria-label="Open ${esc(m.name)}, ${esc(m.role)}"></a>`}
         <div class="strip"><span>${esc(m.role)}</span></div>
         <div class="badge-body">
           <div class="ph"><img src="${esc(photoOf(m))}" alt="" width="200" height="250" ${o.preview ? "" : 'loading="lazy"'} decoding="async"></div>
@@ -135,13 +170,17 @@
   function renderProfile(id) {
     const el = views.profile;
     const back = `<div class="bar"><a class="btn-ghost" href="#/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Team</a>`;
-    const m = members.find((x) => x.id === id);
+    const m = findMember(id);
     if (!m) {
       el.innerHTML = back + `</div>` + (ready
         ? `<div class="empty"><h3>Card not found</h3><p>This card was removed or never existed.</p><a class="btn" href="#/">See the team</a></div>`
         : loadFailed ? `<div class="empty"><h3>Can't load this card</h3><p>Check your internet connection.</p><button class="btn" id="retry2">Try again</button></div>` : '<div class="skel" style="margin-top:80px;height:420px"></div>');
       document.title = "Team SRC · Sahyadri Robotics Club";
       return;
+    }
+    const cleanSlug = slugFor(m);
+    if (id !== cleanSlug && location.hash !== "#/m/" + cleanSlug) {
+      history.replaceState(null, "", "#/m/" + cleanSlug);
     }
     const mine = getMine(), own = mine && mine.id === m.id && isOpen;
     const rows = L.filled(m).map(({ p, href, text }) =>
@@ -165,8 +204,10 @@
   views.profile.addEventListener("click", async (e) => {
     if (e.target.closest("#retry2")) return loadData();
     if (!e.target.closest("#shareBtn")) return;
-    const id = (location.hash.split("/")[2] || ""), m = members.find((x) => x.id === id); if (!m) return;
-    const url = shareUrl("#/m/" + id);
+    const rawId = (location.hash.split("/")[2] || "");
+    const m = findMember(rawId);
+    if (!m) return;
+    const url = shareUrl("#/m/" + slugFor(m));
     try {
       if (navigator.share) await navigator.share({ title: m.name + " · Team SRC", url });
       else { await navigator.clipboard.writeText(url); say("Link copied"); }
@@ -239,7 +280,8 @@
         <p class="hint">${esc(p.hint)}</p><p class="err" id="e-${p.key}" role="alert"></p></div>`;
     }).join("");
 
-    el.innerHTML = `<div class="bar"><a class="btn-ghost" href="${editing ? "#/m/" + esc(editId) : "#/"}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>${editing ? "Cancel" : "Team"}</a></div>
+    const backUrl = editing ? "#/m/" + esc(slugFor(m) || editId) : "#/";
+    el.innerHTML = `<div class="bar"><a class="btn-ghost" href="${backUrl}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>${editing ? "Cancel" : "Team"}</a></div>
       <h1 class="form-title">${editing ? "Edit your card" : "Add your card"}</h1>
       <p class="lede">${editing ? "Change anything below. Your card updates as soon as you save." : "Add your photo and the links you want people to see. Only the links you fill in show up on your card."}</p>
       <div class="pv-label">Live preview</div>
@@ -332,10 +374,11 @@
         if (editing) {
           const mine = getMine(); if (!mine || mine.id !== editId) throw new Error("not allowed");
           await api.update(editId, mine.key, v); store.del("src_cache_v1"); await loadData(true);
-          say("Saved"); location.hash = "#/m/" + editId;
+          const targetSlug = slugFor(v.name ? { ...m, ...v, id: editId } : m);
+          say("Saved"); location.hash = "#/m/" + targetSlug;
         } else {
           const r = await api.add(v, $("#f-hp").value); store.set("src_mine", { id: r.id, key: r.key }); store.del("src_cache_v1");
-          await loadData(true); updateCTA(); renderSuccess(r);
+          await loadData(true); updateCTA(); renderSuccess(r, v.name);
         }
       } catch (err) {
         $("#formErr").innerHTML = `<div class="formerr" role="alert">${esc(friendly(err))}</div>`;
@@ -352,13 +395,14 @@
     paintPreview();
   }
 
-  function renderSuccess(r) {
+  function renderSuccess(r, name) {
     const link = shareUrl("#/edit/" + r.id + "/" + r.key);
+    const targetSlug = slugFor({ id: r.id, name: name || "" }) || r.id;
     views.form.innerHTML = `<div class="success"><div class="tick" aria-hidden="true">✓</div>
       <h1 class="form-title">You're on the team page</h1>
       <p class="lede">Your card is live. Save the private link below to edit your card later from any phone or laptop. Don't share it with anyone.</p>
       <div class="keybox"><input class="inp" id="keyLink" readonly value="${esc(link)}" aria-label="Your private edit link"><button class="btn alt" id="copyKey" type="button">Copy</button></div>
-      <div class="stack"><a class="btn block" href="#/m/${esc(r.id)}">View my card</a><a class="btn alt block" href="#/">Back to the team</a></div></div>`;
+      <div class="stack"><a class="btn block" href="#/m/${esc(targetSlug)}">View my card</a><a class="btn alt block" href="#/">Back to the team</a></div></div>`;
     $("#copyKey").addEventListener("click", async () => {
       try { await navigator.clipboard.writeText(link); say("Private link copied"); } catch (e) { const i = $("#keyLink"); i.select(); say("Press copy on your keyboard"); }
     });

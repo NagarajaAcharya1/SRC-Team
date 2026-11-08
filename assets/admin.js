@@ -39,7 +39,7 @@
           </div>
           <div class="adm-ctl">
             <button class="btn-ghost save" type="button">Save</button>
-            <a class="btn-ghost" href="index.html#/m/${esc(m.id)}" target="_blank" rel="noopener">View</a>
+            <a class="btn-ghost" href="index.html#/m/${esc(window.SrcLinks.toSlug(m.name) || m.id)}" target="_blank" rel="noopener">View</a>
             ${editKey ? `<a class="btn-ghost" href="index.html#/edit/${esc(m.id)}/${esc(editKey)}" target="_blank" rel="noopener" style="color:var(--cyan);border-color:rgba(47,182,230,.5)" title="Edit photo, name, and social links">Edit Card</a>` : ""}
             <button class="btn-ghost del" type="button" style="color:#ff6b8a;border-color:rgba(255,107,138,.5)">Delete</button>
           </div>
