@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0014">
+<meta name="description" content="Meet the people behind Sahyadri Robotics Club (SRC). Tap a badge to see their profile and get in touch.">
+<meta property="og:title" content="Team SRC · Sahyadri Robotics Club">
+<meta property="og:description" content="Meet the people behind Sahyadri Robotics Club.">
+<meta property="og:image" content="assets/icon.png">
+<title>Team SRC · Sahyadri Robotics Club</title>
+<link rel="icon" type="image/png" href="assets/icon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<link rel="preload" href="fonts/unbounded-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/manrope-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="config.js"></script>
+<script src="vendor/supabase.js" defer></script>
+<script src="assets/links.js" defer></script>
+<script src="assets/api.js" defer></script>
+<script src="assets/app.js" defer></script>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="demo" id="demoBanner" hidden><b>Demo mode.</b> Cards are saved only in this browser. Add your Supabase keys in <b>config.js</b> to go live.</div>
+
+<!-- ============ TEAM LIST ============ -->
+<main class="view active" id="home">
+  <div class="top">
+    <img src="assets/icon.png" alt="" width="44" height="38">
+    <span>Sahyadri<br>Robotics Club</span>
+  </div>
+  <header class="hero">
+    <svg class="bg-gear" id="heroGear" viewBox="-100 -100 200 200" aria-hidden="true"></svg>
+    <h1>Team</h1>
+    <img class="logo-big" src="assets/logo.webp" alt="SRC" width="1000" height="408" fetchpriority="high">
+    <p><b id="count">The people</b> behind the club. Tap a badge to see their profile and get in touch.</p>
+    <div class="cta" id="cta">
+      <a class="btn" id="ctaBtn" href="#/join" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span id="ctaText">Add your card</span>
+      </a>
+      <span class="note" id="ctaNote"></span>
+    </div>
+  </header>
+
+  <div class="chips" id="chips" role="group" aria-label="Filter by role"></div>
+  <section class="list" id="list" aria-label="Team members"></section>
+  <footer><a href="#" id="siteLink" target="_blank" rel="noopener">Sahyadri Robotics Club</a></footer>
+</main>
+
+<!-- ============ PROFILE ============ -->
+<main class="view profile" id="profile"></main>
+
+<!-- ============ ADD / EDIT ============ -->
+<main class="view" id="form"></main>
+
+<a class="fab" id="fab" href="#/join" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  <span id="fabText">Add your card</span>
+</a>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="position:relative;z-index:2;padding:30px;text-align:center">Please turn on JavaScript to see the team.</p></noscript>
+</body>
+</html>

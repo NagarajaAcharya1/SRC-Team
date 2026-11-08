@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0b0014">
+<title>Team SRC · Admin</title>
+<link rel="icon" type="image/png" href="assets/icon.png">
+<link rel="stylesheet" href="assets/styles.css">
+<script src="config.js"></script>
+<script src="vendor/supabase.js" defer></script>
+<script src="assets/links.js" defer></script>
+<script src="assets/api.js" defer></script>
+<script src="assets/admin.js" defer></script>
+</head>
+<body>
+<div class="demo" id="demoBanner" hidden><b>Demo mode.</b> The passcode is <b>admin</b>. Data is this browser's only.</div>
+<main class="view active" id="app">
+  <div class="top"><img src="assets/icon.png" alt="" width="44" height="38"><span>Team SRC<br>Admin</span></div>
+
+  <section id="login" style="margin-top:34px">
+    <h1 class="form-title">Admin</h1>
+    <p class="lede">Hide, reorder, re-role or delete cards, and open or close submissions.</p>
+    <form id="loginForm" class="field" style="margin-top:22px">
+      <label for="pass">Admin passcode</label>
+      <input class="inp" id="pass" type="password" autocomplete="current-password" required>
+      <p class="err" id="loginErr" role="alert"></p>
+      <div class="submit" style="margin-top:16px"><button class="btn block" type="submit">Sign in</button></div>
+    </form>
+  </section>
+
+  <section id="panel" hidden>
+    <div class="adm-top">
+      <div><b id="total"></b><div class="hint" id="openState"></div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-ghost" id="toggleOpen" type="button"></button>
+        <button class="btn-ghost" id="out" type="button">Sign out</button>
+      </div>
+    </div>
+    <p class="hint">Lower order number shows first. Leads are usually 1 to 5.</p>
+    <div id="rows"></div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
