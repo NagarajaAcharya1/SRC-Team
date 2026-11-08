@@ -338,9 +338,16 @@ body::before{
 .owner{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
 @media (min-width:480px){.owner{margin-top:22px}}
 
-footer{margin-top:46px;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--lilac)}
+footer{
+  margin-top:46px;text-align:center;font-family:var(--mono);font-size:11px;
+  letter-spacing:.14em;color:var(--lilac);display:flex;flex-direction:column;gap:8px
+}
 @media (min-width:480px){footer{margin-top:54px}}
-footer a{color:#fff;text-decoration:none;border-bottom:1px solid var(--cyan)}
+footer a{color:#fff;text-decoration:none;border-bottom:1px solid var(--cyan);transition:color .2s,border-color .2s}
+footer a:hover{color:var(--cyan)}
+footer .credit{font-size:10.5px;letter-spacing:.11em;color:rgba(201,168,255,.75);text-transform:none}
+footer .credit a{color:var(--paper);border-bottom:1px solid var(--lilac)}
+footer .credit a:hover{color:var(--cyan);border-color:var(--cyan)}
 
 /* ================= FORM ================= */
 .form-title{font-family:var(--display);font-weight:800;font-size:clamp(22px,7vw,36px);line-height:1.05;letter-spacing:-.02em;margin-top:6px}

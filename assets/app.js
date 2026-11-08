@@ -259,7 +259,10 @@
         ${rows ? `<div class="rows">${rows}</div>` : `<p class="none">${esc(m.name.split(" ")[0])} hasn't added any links yet.</p>`}
         ${own ? `<div class="owner"><a class="btn alt" href="#/edit">Edit my card</a></div>` : ""}
       </section>
-      <footer><a href="#/">See the whole team</a></footer>`;
+      <footer>
+        <p><a href="#/">See the whole team</a></p>
+        <p class="credit">Designed and Developed by <a href="https://www.nagarajaacharya.site/" target="_blank" rel="noopener">Nagaraja</a></p>
+      </footer>`;
     document.title = m.name + " · Team SRC";
   }
   views.profile.addEventListener("click", async (e) => {
